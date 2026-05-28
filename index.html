@@ -31,9 +31,7 @@
             touch-action: none; /* Previene el scroll al jugar en móviles */
         }
 
-        /* =========================================
-           PANTALLA DEL MINI-JUEGO
-           ========================================= */
+       
         #game-screen {
             position: fixed;
             top: 0;
@@ -64,14 +62,14 @@
             bottom: 50px;
         }
 
-        /* Flecha de puntería dinámica */
+       
         .aim-arrow {
             width: 30px;
             height: 60px;
             position: absolute;
-            bottom: 60px; /* Anclada sobre la posición original del balón */
+            bottom: 60px; 
             transform-origin: bottom center;
-            opacity: 0; /* Oculta hasta que se arrastra */
+            opacity: 0; 
             pointer-events: none;
             z-index: 4;
         }
@@ -102,9 +100,7 @@
             50% { opacity: 0.5; }
         }
 
-        /* =========================================
-           PANTALLA DE INVITACIÓN PRINCIPAL
-           ========================================= */
+  
         #main-invitation {
             position: relative;
             width: 100%;
@@ -143,7 +139,7 @@
             border-left: 120px solid transparent;
         }
 
-        /* Contenedores de Logos (Listos para PNG) */
+        
         .fifa-logo-container {
             width: 80px;
             height: auto;
@@ -362,14 +358,14 @@
         let isDragging = false;
         let startX, startY;
         let currentX = 0, currentY = 0;
-        const MAX_DRAG = 120; // Límite máximo para jalar el balón
+        const MAX_DRAG = 120; 
 		
 
-        // Funciones para manejar el inicio del arrastre
+        
         function startDrag(e) {
             if (!gameActive) return;
             isDragging = true;
-            ball.style.transition = 'none'; // Quitar transición para movimiento fluido
+            ball.style.transition = 'none'; 
             arrow.style.opacity = '1';
             
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -378,10 +374,10 @@
             startY = clientY;
         }
 
-        // Funciones para manejar el movimiento durante el arrastre
+        
         function moveDrag(e) {
             if (!isDragging || !gameActive) return;
-            e.preventDefault(); // Evitar scroll
+            e.preventDefault(); 
             
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -389,7 +385,7 @@
             let dx = clientX - startX;
             let dy = clientY - startY;
 
-            // Limitar la distancia máxima de arrastre
+            
             const distance = Math.hypot(dx, dy);
             if (distance > MAX_DRAG) {
                 dx = (dx / distance) * MAX_DRAG;
@@ -399,16 +395,16 @@
             currentX = dx;
             currentY = dy;
 
-            // Mover el balón visualmente
+            
             ball.style.transform = `translate(${dx}px, ${dy}px)`;
 
-            // Calcular y rotar la flecha (apunta al lado opuesto del arrastre)
+            
             const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-            // El -90 corrige la orientación base de la flecha
+            
             arrow.style.transform = `rotate(${angle - 90}deg) scaleY(${Math.max(0.5, distance / 30)})`;
         }
 
-        // Función al soltar el balón
+        
         function endDrag() {
             if (!isDragging || !gameActive) return;
             isDragging = false;
@@ -421,28 +417,28 @@
                 return;
             }
 
-            // ¡Disparar!
+            
             gameActive = false;
             
-            // Multiplicador de fuerza y cálculo de trayectoria invertida
+            
             const powerMultiplier = 3.5;
             const shootX = -currentX * powerMultiplier;
-            const shootY = -currentY * powerMultiplier - 150; // -150 añade impulso hacia arriba/fondo
+            const shootY = -currentY * powerMultiplier - 150; 
 
             ball.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
             ball.style.transform = `translate(${shootX}px, ${shootY}px) scale(0.4)`;
             ball.style.opacity = '0.8';
 
-            // Evaluar si fue gol al terminar la animación
+            
             setTimeout(() => {
                 const ballRect = ball.getBoundingClientRect();
                 const goalRect = goal.getBoundingClientRect();
                 
-                // Calcular centro del balón
+                
                 const ballCenterX = ballRect.left + ballRect.width / 2;
                 const ballCenterY = ballRect.top + ballRect.height / 2;
 
-                // Comprobar si el centro del balón está dentro del recuadro de la portería
+                
                 if (ballCenterX > goalRect.left && 
                     ballCenterX < goalRect.right && 
                     ballCenterY > goalRect.top && 
@@ -455,7 +451,7 @@
                     statusText.textContent = '¡Fallaste! Intenta de nuevo...';
                     statusText.style.color = 'var(--adidas-red)';
                     
-                    // Resetear el juego
+                    
                     setTimeout(() => {
                         ball.style.transition = 'all 0.4s ease';
                         ball.style.transform = 'translate(0, 0) scale(1)';
@@ -469,17 +465,17 @@
             }, 600);
         }
 
-        // Asignar eventos de Mouse (PC)
+        
         ball.addEventListener('mousedown', startDrag);
         window.addEventListener('mousemove', moveDrag);
         window.addEventListener('mouseup', endDrag);
 
-        // Asignar eventos Táctiles (Móviles)
+        
         ball.addEventListener('touchstart', startDrag, {passive: false});
         window.addEventListener('touchmove', moveDrag, {passive: false});
         window.addEventListener('touchend', endDrag);
 
-        // Función para abrir la invitación
+        
         function openInvitation() {
             const gameScreen = document.getElementById('game-screen');
             gameScreen.style.opacity = '0';
@@ -487,10 +483,10 @@
 
             const main = document.getElementById('main-invitation');
             main.classList.add('active');
-            document.body.style.overflow = 'auto'; // Permitir scroll
+            document.body.style.overflow = 'auto'; 
         }
 
-        // Botón confirmar asistencia
+        
         document.getElementById('btn-confirmar').addEventListener('click', function() {
             alert('¡Genial! Tu asistencia a la presentación ha sido confirmada. ¡Nos vemos en ESCA!');
             this.innerHTML = "✓ ASISTENCIA CONFIRMADA";
