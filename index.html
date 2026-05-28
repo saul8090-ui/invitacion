@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitación Adidas - ESCA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --adidas-green: #0f5b33;
+            --adidas-dark: #0a3a20;
+            --adidas-red: #c8102e;
+            --adidas-gold: #f4d03f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow: hidden; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            touch-action: none; /* Previene el scroll al jugar en móviles */
+        }
+
+        /* =========================================
+           PANTALLA DEL MINI-JUEGO
+           ========================================= */
+        #game-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, var(--adidas-green) 0%, var(--adidas-dark) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .pixel-goal {
+            width: 250px;
+            height: auto;
+            margin-top: 50px;
+        }
+
+        .game-area {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            bottom: 50px;
+        }
+
+        /* Flecha de puntería dinámica */
+        .aim-arrow {
+            width: 30px;
+            height: 60px;
+            position: absolute;
+            bottom: 60px; /* Anclada sobre la posición original del balón */
+            transform-origin: bottom center;
+            opacity: 0; /* Oculta hasta que se arrastra */
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        .pixel-ball {
+            width: 80px;
+            height: 80px;
+            cursor: grab;
+            z-index: 5;
+            position: relative;
+        }
+
+        .pixel-ball:active {
+            cursor: grabbing;
+        }
+
+        .tap-text {
+            margin-top: 40px;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-align: center;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* =========================================
+           PANTALLA DE INVITACIÓN PRINCIPAL
+           ========================================= */
+        #main-invitation {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 100vh;
+            background: linear-gradient(to bottom, #106637 0%, #093b1f 100%);
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            overflow-y: auto;
+        }
+
+        #main-invitation.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .corner-tl {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-top: 120px solid var(--adidas-red);
+            border-right: 120px solid transparent;
+        }
+
+        .corner-tr {
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-top: 120px solid var(--adidas-red);
+            border-left: 120px solid transparent;
+        }
+
+        /* Contenedores de Logos (Listos para PNG) */
+        .fifa-logo-container {
+            width: 80px;
+            height: auto;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            z-index: 2;
+        }
+
+        .adidas-logo-container {
+            width: 280px;
+            height: auto;
+            margin-bottom: 10px;
+            z-index: 2;
+        }
+
+        .fifa-logo-img, .adidas-logo-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        .stars {
+            color: var(--adidas-gold);
+            font-size: 1.5rem;
+            letter-spacing: 30px;
+            margin-left: 30px;
+            margin-bottom: 30px;
+        }
+
+        .te-invita {
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .campaign-text {
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 5px;
+        }
+
+        .quote {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            line-height: 1.3;
+        }
+
+        .location {
+            font-size: 1.4rem;
+            font-weight: 400;
+            margin-bottom: 40px;
+            line-height: 1.4;
+        }
+
+        .date-time-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .date-time-text {
+            font-size: 1.8rem;
+            line-height: 1.1;
+        }
+
+        .date-time-text.left { text-align: right; }
+        .date-time-text.right { text-align: left; }
+        .date-time-text span { display: block; }
+
+        .divider {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 20px;
+        }
+
+        .square {
+            width: 8px;
+            height: 8px;
+            border: 2px solid var(--adidas-gold);
+        }
+
+        .line {
+            width: 2px;
+            height: 60px;
+            background-color: var(--adidas-gold);
+            margin: 5px 0;
+        }
+
+        .footer-text {
+            font-size: 1rem;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .btn-confirmar {
+            background-color: #fff;
+            color: var(--adidas-dark);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .btn-confirmar:hover {
+            background-color: var(--adidas-gold);
+            transform: translateY(-2px);
+        }
+
+        .btn-confirmar:active {
+            transform: translateY(1px);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="game-screen">
+        <svg class="pixel-goal" id="goal-target" viewBox="0 0 50 30" shape-rendering="crispEdges">
+            <rect x="5" y="5" width="40" height="25" fill="#f0f0f0" />
+            <rect x="7" y="7" width="1" height="23" fill="#fff" />
+            <rect x="42" y="7" width="1" height="23" fill="#fff" />
+            <rect x="7" y="7" width="36" height="1" fill="#fff" />
+            <rect x="7" y="12" width="36" height="1" fill="#c0c0c0" opacity="0.3" />
+            <rect x="7" y="17" width="36" height="1" fill="#c0c0c0" opacity="0.3" />
+            <rect x="7" y="22" width="36" height="1" fill="#c0c0c0" opacity="0.3" />
+            <rect x="15" y="7" width="1" height="23" fill="#c0c0c0" opacity="0.3" />
+            <rect x="25" y="7" width="1" height="23" fill="#c0c0c0" opacity="0.3" />
+            <rect x="35" y="7" width="1" height="23" fill="#c0c0c0" opacity="0.3" />
+            <rect x="2" y="2" width="3" height="28" fill="#fff" />
+            <rect x="45" y="2" width="3" height="28" fill="#fff" />
+            <rect x="2" y="2" width="46" height="3" fill="#fff" />
+            <rect x="0" y="28" width="50" height="2" fill="#000" />
+        </svg>
+
+        <div class="game-area">
+            <svg class="aim-arrow" id="aim-arrow" viewBox="0 0 16 32" preserveAspectRatio="none">
+                <path d="M8,0 L16,10 L10,10 L10,32 L6,32 L6,10 L0,10 Z" fill="rgba(255,255,255,0.7)"/>
+            </svg>
+
+            <svg class="pixel-ball" id="game-ball" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                <path d="M5,0 h6 v2 h3 v3 h2 v6 h-2 v3 h-3 v2 h-6 v-2 h-3 v-3 h-2 v-6 h2 v-3 h3 z" fill="#ffffff" />
+                <rect x="6" y="2" width="4" height="3" fill="#000" />
+                <rect x="2" y="6" width="3" height="4" fill="#000" />
+                <rect x="11" y="6" width="3" height="4" fill="#000" />
+                <rect x="6" y="11" width="4" height="3" fill="#000" />
+            </svg>
+            <p id="game-status" class="tap-text">Jala el balón hacia atrás para tirar</p>
+        </div>
+    </div>
+
+    <div id="main-invitation">
+        <div class="corner-tl"></div>
+        <div class="corner-tr"></div>
+
+        <div class="fifa-logo-container">
+            <img src="https://i.logos-download.com/114058/30065-s640-2739a967f919772c47599eef52fc50bd.png/2026_FIFA_World_Cup_Logo_2023-s640.png?dl" alt="FIFA World Cup 2026" class="fifa-logo-img">
+        </div>
+
+        <div class="adidas-logo-container">
+            <img src="https://1000marcas.net/wp-content/uploads/2019/11/Logo-Adidas.png" alt="Adidas Logo" class="adidas-logo-img">
+        </div>
+        
+        <div class="stars">★ ★ ★</div>
+
+        <h2 class="te-invita">TE INVITA</h2>
+
+        <p class="campaign-text">Presentacion de la campaña</p>
+        <p class="quote">"La pasión no cabe en el estadio"</p>
+
+        <p class="location">
+            ESCA Santo Tomás<br>
+            Salón B214
+        </p>
+
+        <div class="date-time-container">
+            <div class="date-time-text left">
+                <span>2 DE</span>
+                <span>JUNIO</span>
+            </div>
+            
+            <div class="divider">
+                <div class="square"></div>
+                <div class="line"></div>
+                <div class="square"></div>
+            </div>
+
+            <div class="date-time-text right">
+                <span>HORA:</span>
+                <span>12:00 P.M.</span>
+            </div>
+        </div>
+
+        <p class="footer-text">Te invitamos a venir con una prenda Adidas o mundialista</p>
+
+        <button class="btn-confirmar" id="btn-confirmar">Confirmar Asistencia</button>
+    </div>
+
+    <script>
+        const ball = document.getElementById('game-ball');
+        const goal = document.getElementById('goal-target');
+        const arrow = document.getElementById('aim-arrow');
+        const statusText = document.getElementById('game-status');
+        
+        let gameActive = true;
+        let isDragging = false;
+        let startX, startY;
+        let currentX = 0, currentY = 0;
+        const MAX_DRAG = 120; // Límite máximo para jalar el balón
+		
+
+        // Funciones para manejar el inicio del arrastre
+        function startDrag(e) {
+            if (!gameActive) return;
+            isDragging = true;
+            ball.style.transition = 'none'; // Quitar transición para movimiento fluido
+            arrow.style.opacity = '1';
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            startX = clientX;
+            startY = clientY;
+        }
+
+        // Funciones para manejar el movimiento durante el arrastre
+        function moveDrag(e) {
+            if (!isDragging || !gameActive) return;
+            e.preventDefault(); // Evitar scroll
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            let dx = clientX - startX;
+            let dy = clientY - startY;
+
+            // Limitar la distancia máxima de arrastre
+            const distance = Math.hypot(dx, dy);
+            if (distance > MAX_DRAG) {
+                dx = (dx / distance) * MAX_DRAG;
+                dy = (dy / distance) * MAX_DRAG;
+            }
+
+            currentX = dx;
+            currentY = dy;
+
+            // Mover el balón visualmente
+            ball.style.transform = `translate(${dx}px, ${dy}px)`;
+
+            // Calcular y rotar la flecha (apunta al lado opuesto del arrastre)
+            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+            // El -90 corrige la orientación base de la flecha
+            arrow.style.transform = `rotate(${angle - 90}deg) scaleY(${Math.max(0.5, distance / 30)})`;
+        }
+
+        // Función al soltar el balón
+        function endDrag() {
+            if (!isDragging || !gameActive) return;
+            isDragging = false;
+            arrow.style.opacity = '0';
+
+            // Si no se jaló lo suficiente, cancelar tiro y devolver al centro
+            if (Math.hypot(currentX, currentY) < 20) {
+                ball.style.transition = 'transform 0.3s ease';
+                ball.style.transform = 'translate(0px, 0px)';
+                return;
+            }
+
+            // ¡Disparar!
+            gameActive = false;
+            
+            // Multiplicador de fuerza y cálculo de trayectoria invertida
+            const powerMultiplier = 3.5;
+            const shootX = -currentX * powerMultiplier;
+            const shootY = -currentY * powerMultiplier - 150; // -150 añade impulso hacia arriba/fondo
+
+            ball.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+            ball.style.transform = `translate(${shootX}px, ${shootY}px) scale(0.4)`;
+            ball.style.opacity = '0.8';
+
+            // Evaluar si fue gol al terminar la animación
+            setTimeout(() => {
+                const ballRect = ball.getBoundingClientRect();
+                const goalRect = goal.getBoundingClientRect();
+                
+                // Calcular centro del balón
+                const ballCenterX = ballRect.left + ballRect.width / 2;
+                const ballCenterY = ballRect.top + ballRect.height / 2;
+
+                // Comprobar si el centro del balón está dentro del recuadro de la portería
+                if (ballCenterX > goalRect.left && 
+                    ballCenterX < goalRect.right && 
+                    ballCenterY > goalRect.top && 
+                    ballCenterY < goalRect.bottom) {
+                    
+                    statusText.textContent = '¡¡¡GOOOOOOL!!! Abriendo invitación...';
+                    statusText.style.color = '#fff';
+                    setTimeout(openInvitation, 800);
+                } else {
+                    statusText.textContent = '¡Fallaste! Intenta de nuevo...';
+                    statusText.style.color = 'var(--adidas-red)';
+                    
+                    // Resetear el juego
+                    setTimeout(() => {
+                        ball.style.transition = 'all 0.4s ease';
+                        ball.style.transform = 'translate(0, 0) scale(1)';
+                        ball.style.opacity = '1';
+                        currentX = 0; currentY = 0;
+                        statusText.textContent = 'Jala el balón hacia atrás para tirar';
+                        statusText.style.color = '#fff';
+                        gameActive = true;
+                    }, 1200);
+                }
+            }, 600);
+        }
+
+        // Asignar eventos de Mouse (PC)
+        ball.addEventListener('mousedown', startDrag);
+        window.addEventListener('mousemove', moveDrag);
+        window.addEventListener('mouseup', endDrag);
+
+        // Asignar eventos Táctiles (Móviles)
+        ball.addEventListener('touchstart', startDrag, {passive: false});
+        window.addEventListener('touchmove', moveDrag, {passive: false});
+        window.addEventListener('touchend', endDrag);
+
+        // Función para abrir la invitación
+        function openInvitation() {
+            const gameScreen = document.getElementById('game-screen');
+            gameScreen.style.opacity = '0';
+            gameScreen.style.visibility = 'hidden';
+
+            const main = document.getElementById('main-invitation');
+            main.classList.add('active');
+            document.body.style.overflow = 'auto'; // Permitir scroll
+        }
+
+        // Botón confirmar asistencia
+        document.getElementById('btn-confirmar').addEventListener('click', function() {
+            alert('¡Genial! Tu asistencia a la presentación ha sido confirmada. ¡Nos vemos en ESCA!');
+            this.innerHTML = "✓ ASISTENCIA CONFIRMADA";
+            this.style.backgroundColor = "var(--adidas-gold)";
+            this.style.pointerEvents = "none";
+        });
+    </script>
+</body>
+</html>
