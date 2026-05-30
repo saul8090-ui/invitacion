@@ -26,7 +26,7 @@
             touch-action: none;
         }
 
-        /* === PANTALLA DEL JUEGO === */
+        
         #game-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at center, var(--adidas-green) 0%, var(--adidas-dark) 100%);
@@ -58,7 +58,7 @@
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        /* === INVITACIÓN PRINCIPAL === */
+        
         #main-invitation {
             position: relative; width: 100%; max-width: 500px; height: 100vh;
             background: linear-gradient(to bottom, #106637 0%, #093b1f 100%);
@@ -173,15 +173,12 @@
         <button class="btn-confirmar" id="btn-confirmar">Confirmar Asistencia</button>
     </div>
 
-    <script>
-        
+  <script>
         const audioGol = new Audio('https://cdn.pixabay.com/download/audio/2025/03/13/audio_c182c14dd0.mp3?filename=forza1903-a-football-hits-the-net-goal-313216.mp3');
         const audioConfirmar = new Audio('https://cdn.pixabay.com/download/audio/2026/01/24/audio_d050f34e8a.mp3?filename=dragon-studio-correct-472358.mp3');
         
-        
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwau3NU3HutYO5LjEfv4hqfz41DjZWo3LChZ-jaglgGNzWapF9tzYodF8JDMvssUJR9/exec'; 
 
-        
         const ball = document.getElementById('game-ball');
         const goal = document.getElementById('goal-target');
         const arrow = document.getElementById('aim-arrow');
@@ -287,28 +284,38 @@
             document.body.style.overflow = 'auto';
         }
 
-       
         const btnConfirmar = document.getElementById('btn-confirmar');
         
+        
+        const boletoGuardado = localStorage.getItem('boletoAdidas');
+        
+        if (boletoGuardado) {
+            btnConfirmar.innerHTML = `✓ TU BOLETO ES: ${boletoGuardado}`;
+            btnConfirmar.style.backgroundColor = "var(--adidas-gold)";
+            btnConfirmar.style.pointerEvents = "none";
+        }
+
         btnConfirmar.addEventListener('click', function() {
             if(!APP_SCRIPT_URL.includes('script.google.com')) {
                 alert("Por favor, configura la URL de Apps Script en el código primero.");
                 return;
             }
 
-            
             btnConfirmar.innerText = "Asignando boleto...";
             btnConfirmar.disabled = true;
 
-            
             fetch(APP_SCRIPT_URL)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         audioConfirmar.play().catch(e => console.log("Audio bloqueado"));
+                        
+                        
+                        localStorage.setItem('boletoAdidas', data.ticket);
+                        
                         btnConfirmar.innerHTML = `✓ BOLETO: ${data.ticket}`;
                         btnConfirmar.style.backgroundColor = "var(--adidas-gold)";
-                        alert(`¡Asistencia confirmada!\nTu boleto de entrada es el: ${data.ticket}\n\n¡Nos vemos en ESCA! Recueda tu boleto para una sorpresa`);
+                        alert(`¡Asistencia confirmada!\nTu boleto de entrada es el: ${data.ticket}\n\n¡Nos vemos en ESCA! Recuerda tu boleto para una sorpresa`);
                     } else {
                         btnConfirmar.innerText = "Agotados";
                         alert("Lo sentimos, ya no hay lugares disponibles.");
