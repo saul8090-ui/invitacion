@@ -174,14 +174,14 @@
     </div>
 
     <script>
-        // === CONFIGURACIÓN DE AUDIOS Y BASE DE DATOS ===
+        
         const audioGol = new Audio('https://cdn.pixabay.com/download/audio/2025/03/13/audio_c182c14dd0.mp3?filename=forza1903-a-football-hits-the-net-goal-313216.mp3');
         const audioConfirmar = new Audio('https://cdn.pixabay.com/download/audio/2026/01/24/audio_d050f34e8a.mp3?filename=dragon-studio-correct-472358.mp3');
         
-        // ¡Aquí está la corrección! Añadidas las comillas simples
+        
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwau3NU3HutYO5LjEfv4hqfz41DjZWo3LChZ-jaglgGNzWapF9tzYodF8JDMvssUJR9/exec'; 
 
-        // === LÓGICA DEL JUEGO ===
+        
         const ball = document.getElementById('game-ball');
         const goal = document.getElementById('goal-target');
         const arrow = document.getElementById('aim-arrow');
@@ -287,7 +287,7 @@
             document.body.style.overflow = 'auto';
         }
 
-        // === CONEXIÓN CON LA BASE DE DATOS ===
+       
         const btnConfirmar = document.getElementById('btn-confirmar');
         
         btnConfirmar.addEventListener('click', function() {
@@ -296,11 +296,11 @@
                 return;
             }
 
-            // Cambiar estado del botón mientras carga
+            
             btnConfirmar.innerText = "Asignando boleto...";
             btnConfirmar.disabled = true;
 
-            // Llamar a Google Apps Script
+            
             fetch(APP_SCRIPT_URL)
                 .then(response => response.json())
                 .then(data => {
@@ -308,7 +308,7 @@
                         audioConfirmar.play().catch(e => console.log("Audio bloqueado"));
                         btnConfirmar.innerHTML = `✓ BOLETO: ${data.ticket}`;
                         btnConfirmar.style.backgroundColor = "var(--adidas-gold)";
-                        alert(`¡Asistencia confirmada!\nTu boleto de entrada es el: ${data.ticket}\n\n¡Nos vemos en ESCA!`);
+                        alert(`¡Asistencia confirmada!\nTu boleto de entrada es el: ${data.ticket}\n\n¡Nos vemos en ESCA! Recueda tu boleto para una sorpresa`);
                     } else {
                         btnConfirmar.innerText = "Agotados";
                         alert("Lo sentimos, ya no hay lugares disponibles.");
